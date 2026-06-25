@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axios";
+import SkeletonLoader from "../../components/SkeletonLoader";
 import StatCard from "../../components/StatCard";
 
 function ManagerDashboard() {
@@ -10,8 +11,11 @@ function ManagerDashboard() {
     announcementsCount: 0,
   });
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchManagerDashboard = async () => {
+      setLoading(true);
       try {
         const [statsRes, announcementsRes] = await Promise.all([
           API.get("/dashboard/stats"),
@@ -26,6 +30,8 @@ function ManagerDashboard() {
         });
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -45,20 +51,24 @@ function ManagerDashboard() {
         Manager Dashboard 📊
       </h1>
 
-      <div
-        className="
-        grid
-        grid-cols-1
-        md:grid-cols-2
-        lg:grid-cols-4
-        gap-6
-      "
-      >
-        <StatCard title="Total Students" value={stats.totalStudents} />
-        <StatCard title="Today's Attendance" value={stats.todayAttendance} />
-        <StatCard title="Pending Complaints" value={stats.pendingComplaints} />
-        <StatCard title="Announcements" value={stats.announcementsCount} />
-      </div>
+      {loading ? (
+        <SkeletonLoader type="stats" count={4} />
+      ) : (
+        <div
+          className="
+          grid
+          grid-cols-1
+          md:grid-cols-2
+          lg:grid-cols-4
+          gap-6
+        "
+        >
+          <StatCard title="Total Students" value={stats.totalStudents} />
+          <StatCard title="Today's Attendance" value={stats.todayAttendance} />
+          <StatCard title="Pending Complaints" value={stats.pendingComplaints} />
+          <StatCard title="Announcements" value={stats.announcementsCount} />
+        </div>
+      )}
     </div>
   );
 }

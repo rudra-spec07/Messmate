@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axios";
+import SkeletonLoader from "../../components/SkeletonLoader";
 
 function ComplaintManagement() {
   const [complaints, setComplaints] =
     useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchComplaints();
   }, []);
 
   const fetchComplaints = async () => {
+    setLoading(true);
     try {
       const { data } =
         await API.get(
@@ -19,6 +22,8 @@ function ComplaintManagement() {
       setComplaints(data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,102 +56,102 @@ function ComplaintManagement() {
         Complaint Management ⚠️
       </h1>
 
-      <div className="space-y-4">
-
-        {complaints.map(
-          (complaint) => (
-            <div
-              key={complaint._id}
-              className="
-              bg-white
-              dark:bg-slate-900
-              p-5
-              rounded-2xl
-              shadow-lg
-            "
-            >
-              <h2
+      {loading ? (
+        <SkeletonLoader count={3} />
+      ) : (
+        <div className="space-y-4">
+          {complaints.map(
+            (complaint) => (
+              <div
+                key={complaint._id}
                 className="
-                font-bold
-                text-lg
-                dark:text-white
+                bg-white
+                dark:bg-slate-900
+                p-5
+                rounded-2xl
+                shadow-lg
               "
               >
-                {complaint.title}
-              </h2>
-
-              <p
-                className="
-                mt-2
-                dark:text-slate-300
-              "
-              >
-                {
-                  complaint.description
-                }
-              </p>
-
-              <p className="mt-2">
-                Student:
-                {" "}
-                {
-                  complaint.student
-                    ?.name
-                }
-              </p>
-
-              <p className="mt-2">
-                Status:
-                {" "}
-                {
-                  complaint.status
-                }
-              </p>
-
-              <div className="flex gap-3 mt-4">
-
-                <button
-                  onClick={() =>
-                    updateStatus(
-                      complaint._id,
-                      "Resolved"
-                    )
-                  }
+                <h2
                   className="
-                  bg-green-500
-                  text-white
-                  px-4
-                  py-2
-                  rounded-lg
+                  font-bold
+                  text-lg
+                  dark:text-white
                 "
                 >
-                  Resolve
-                </button>
+                  {complaint.title}
+                </h2>
 
-                <button
-                  onClick={() =>
-                    updateStatus(
-                      complaint._id,
-                      "Pending"
-                    )
-                  }
+                <p
                   className="
-                  bg-yellow-500
-                  text-white
-                  px-4
-                  py-2
-                  rounded-lg
+                  mt-2
+                  dark:text-slate-300
                 "
                 >
-                  Pending
-                </button>
+                  {
+                    complaint.description
+                  }
+                </p>
 
+                <p className="mt-2">
+                  Student:
+                  {" "}
+                  {
+                    complaint.student
+                      ?.name
+                  }
+                </p>
+
+                <p className="mt-2">
+                  Status:
+                  {" "}
+                  {
+                    complaint.status
+                  }
+                </p>
+
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={() =>
+                      updateStatus(
+                        complaint._id,
+                        "Resolved"
+                      )
+                    }
+                    className="
+                    bg-green-500
+                    text-white
+                    px-4
+                    py-2
+                    rounded-lg
+                  "
+                  >
+                    Resolve
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      updateStatus(
+                        complaint._id,
+                        "Pending"
+                      )
+                    }
+                    className="
+                    bg-yellow-500
+                    text-white
+                    px-4
+                    py-2
+                    rounded-lg
+                  "
+                  >
+                    Pending
+                  </button>
+                </div>
               </div>
-            </div>
-          )
-        )}
-
-      </div>
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 }

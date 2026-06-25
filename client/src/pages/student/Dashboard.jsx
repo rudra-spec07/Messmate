@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axios";
+import SkeletonLoader from "../../components/SkeletonLoader";
 import StatCard from "../../components/StatCard";
 
 function Dashboard() {
@@ -10,8 +11,11 @@ function Dashboard() {
     announcementsCount: 0,
   });
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchStudentDashboard = async () => {
+      setLoading(true);
       try {
         const [menuRes, attendanceRes, complaintsRes, announcementsRes] = await Promise.all([
           API.get("/menu"),
@@ -28,6 +32,8 @@ function Dashboard() {
         });
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -47,20 +53,24 @@ function Dashboard() {
         Welcome Back 👋
       </h1>
 
-      <div
-        className="
-        grid
-        grid-cols-1
-        md:grid-cols-2
-        lg:grid-cols-4
-        gap-6
-      "
-      >
-        <StatCard title="Today's Menu" value={`${stats.menuCount} Items`} />
-        <StatCard title="Attendance" value={`${stats.attendanceCount} Records`} />
-        <StatCard title="Complaints" value={stats.complaintsCount} />
-        <StatCard title="Announcements" value={stats.announcementsCount} />
-      </div>
+      {loading ? (
+        <SkeletonLoader type="stats" count={4} />
+      ) : (
+        <div
+          className="
+          grid
+          grid-cols-1
+          md:grid-cols-2
+          lg:grid-cols-4
+          gap-6
+        "
+        >
+          <StatCard title="Today's Menu" value={`${stats.menuCount} Items`} />
+          <StatCard title="Attendance" value={`${stats.attendanceCount} Records`} />
+          <StatCard title="Complaints" value={stats.complaintsCount} />
+          <StatCard title="Announcements" value={stats.announcementsCount} />
+        </div>
+      )}
     </div>
   );
 }

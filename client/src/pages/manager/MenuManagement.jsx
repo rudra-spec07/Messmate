@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axios";
+import SkeletonLoader from "../../components/SkeletonLoader";
 
 function ManagerMenu() {
   const [menus, setMenus] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
     date: "",
@@ -16,6 +18,7 @@ function ManagerMenu() {
   }, []);
 
   const fetchMenus = async () => {
+    setLoading(true);
     try {
       const { data } =
         await API.get("/menu");
@@ -23,6 +26,8 @@ function ManagerMenu() {
       setMenus(data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,60 +159,62 @@ function ManagerMenu() {
         </button>
       </div>
 
-      <div className="space-y-4">
-
-        {menus.map((menu) => (
-          <div
-            key={menu._id}
-            className="
-            bg-white
-            dark:bg-slate-900
-            p-5
-            rounded-2xl
-            shadow-lg
-          "
-          >
-            <p>
-              📅 {menu.date}
-            </p>
-
-            <p>
-              🍳 Breakfast:
-              {" "}
-              {menu.breakfast}
-            </p>
-
-            <p>
-              🍛 Lunch:
-              {" "}
-              {menu.lunch}
-            </p>
-
-            <p>
-              🌙 Dinner:
-              {" "}
-              {menu.dinner}
-            </p>
-
-            <button
-              onClick={() =>
-                deleteMenu(menu._id)
-              }
+      {loading ? (
+        <SkeletonLoader count={3} />
+      ) : (
+        <div className="space-y-4">
+          {menus.map((menu) => (
+            <div
+              key={menu._id}
               className="
-              mt-3
-              bg-red-500
-              text-white
-              px-4
-              py-2
-              rounded-lg
+              bg-white
+              dark:bg-slate-900
+              p-5
+              rounded-2xl
+              shadow-lg
             "
             >
-              Delete
-            </button>
-          </div>
-        ))}
+              <p>
+                📅 {menu.date}
+              </p>
 
-      </div>
+              <p>
+                🍳 Breakfast:
+                {" "}
+                {menu.breakfast}
+              </p>
+
+              <p>
+                🍛 Lunch:
+                {" "}
+                {menu.lunch}
+              </p>
+
+              <p>
+                🌙 Dinner:
+                {" "}
+                {menu.dinner}
+              </p>
+
+              <button
+                onClick={() =>
+                  deleteMenu(menu._id)
+                }
+                className="
+                mt-3
+                bg-red-500
+                text-white
+                px-4
+                py-2
+                rounded-lg
+              "
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

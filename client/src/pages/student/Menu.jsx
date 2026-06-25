@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axios";
+import SkeletonLoader from "../../components/SkeletonLoader";
 
 function Menu() {
   const [menu, setMenu] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchMenu();
   }, []);
 
   const fetchMenu = async () => {
+    setLoading(true);
     try {
       const { data } = await API.get(
         "/menu/today"
@@ -17,6 +20,8 @@ function Menu() {
       setMenu(data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -26,9 +31,11 @@ function Menu() {
         Today's Menu 🍽️
       </h1>
 
-      <div className="grid md:grid-cols-3 gap-5">
-
-        <div className="
+      {loading ? (
+        <SkeletonLoader type="menu" count={3} />
+      ) : (
+        <div className="grid md:grid-cols-3 gap-5">
+          <div className="
 bg-white
 dark:bg-slate-900
 p-6
@@ -41,7 +48,7 @@ hover:shadow-xl
 transition-all
 duration-300
 ">
-          <h2
+            <h2
   className="
   font-bold
   mb-2
@@ -49,10 +56,10 @@ duration-300
   dark:text-white
 "
 >
-            Breakfast
-          </h2>
+              Breakfast
+            </h2>
 
-          <p
+            <p
   className="
   mt-4
   text-lg
@@ -63,9 +70,9 @@ duration-300
 >
   {menu?.breakfast}
 </p>
-        </div>
+          </div>
 
-        <div className="
+          <div className="
 bg-white
 dark:bg-slate-900
 p-6
@@ -78,7 +85,7 @@ hover:shadow-xl
 transition-all
 duration-300
 ">
-          <h2
+            <h2
   className="
   font-bold
   mb-2
@@ -86,10 +93,10 @@ duration-300
   dark:text-white
 "
 >
-            Lunch
-          </h2>
+              Lunch
+            </h2>
 
-          <p
+            <p
   className="
   mt-4
   text-lg
@@ -98,12 +105,12 @@ duration-300
   dark:text-slate-300
 "
 >
-            {menu?.lunch ||
-              "No Menu"}
-          </p>
-        </div>
+              {menu?.lunch ||
+                "No Menu"}
+            </p>
+          </div>
 
-        <div className="
+          <div className="
 bg-white
 dark:bg-slate-900
 p-6
@@ -116,7 +123,7 @@ hover:shadow-xl
 transition-all
 duration-300
 ">
-          <h2
+            <h2
   className="
   font-bold
   mb-2
@@ -124,10 +131,10 @@ duration-300
   dark:text-white
 "
 >
-            Dinner
-          </h2>
+              Dinner
+            </h2>
 
-          <p
+            <p
   className="
   mt-4
   text-lg
@@ -136,12 +143,12 @@ duration-300
   dark:text-slate-300
 "
 >
-            {menu?.dinner ||
-              "No Menu"}
-          </p>
+              {menu?.dinner ||
+                "No Menu"}
+            </p>
+          </div>
         </div>
-
-      </div>
+      )}
     </div>
   );
 }

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axios";
+import SkeletonLoader from "../../components/SkeletonLoader";
 
 function AttendanceReport() {
   const [records, setRecords] =
     useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAttendance();
@@ -11,6 +13,7 @@ function AttendanceReport() {
 
   const fetchAttendance =
     async () => {
+      setLoading(true);
       try {
         const { data } =
           await API.get(
@@ -20,6 +23,8 @@ function AttendanceReport() {
         setRecords(data);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -36,43 +41,45 @@ function AttendanceReport() {
         Attendance Report 📊
       </h1>
 
-      <div className="space-y-4">
+      {loading ? (
+        <SkeletonLoader count={4} />
+      ) : (
+        <div className="space-y-4">
+          {records.map(
+            (record) => (
+              <div
+                key={record._id}
+                className="
+                bg-white
+                dark:bg-slate-900
+                p-5
+                rounded-2xl
+                shadow-lg
+              "
+              >
+                <p>
+                  👤 {
+                    record.student
+                      ?.name
+                  }
+                </p>
 
-        {records.map(
-          (record) => (
-            <div
-              key={record._id}
-              className="
-              bg-white
-              dark:bg-slate-900
-              p-5
-              rounded-2xl
-              shadow-lg
-            "
-            >
-              <p>
-                👤 {
-                  record.student
-                    ?.name
-                }
-              </p>
+                <p>
+                  🍽️ {
+                    record.mealType
+                  }
+                </p>
 
-              <p>
-                🍽️ {
-                  record.mealType
-                }
-              </p>
-
-              <p>
-                📅 {
-                  record.date
-                }
-              </p>
-            </div>
-          )
-        )}
-
-      </div>
+                <p>
+                  📅 {
+                    record.date
+                  }
+                </p>
+              </div>
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 }
